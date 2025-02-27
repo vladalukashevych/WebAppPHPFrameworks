@@ -1,0 +1,124 @@
+# -------------------
+# GENERAL IGNORE
+# -------------------
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE & editor files (PhpStorm, VSCode, etc.)
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore environment and security files
+.env
+.env.*
+*.key
+auth.json
+
+# Ignore dependency directories (common for Symfony & Laravel)
+vendor/
+node_modules/
+composer.lock
+package-lock.json
+yarn.lock
+
+# -------------------
+# LARAVEL
+# -------------------
+
+# Laravel environment & cache files
+bootstrap/cache/
+storage/
+storage/framework/cache/
+storage/framework/sessions/
+storage/framework/views/
+storage/logs/
+public/storage
+public/hot
+
+# Laravel deployment files
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+# Laravel build artifacts
+/public/build
+/storage/pail
+
+# -------------------
+# SYMFONY SPECIFIC
+# -------------------
+
+# Symfony cache, logs, and session files
+var/cache/
+var/logs/
+var/sessions/
+
+# Keep required Symfony cache/log folders
+!var/cache/.gitkeep
+!var/logs/.gitkeep
+!var/sessions/.gitkeep
+
+# Symfony config (sensitive data)
+config/secrets/
+config/jwt/
+
+# Symfony deployment files
+/symfony.lock
+/.symfony/
+.symfony5/
+.symfony.cloud/
+
+# Symfony build artifacts
+/.web-server-pid
+/web/uploads/
+public/bundles/
+
+# -------------------
+# FRONTEND 
+# -------------------
+
+# Node.js dependencies
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build & dist folders
+/public/build
+/dist/
+/coverage/
+.vite/
+
+# -------------------
+# DEBUG & TESTING
+# -------------------
+
+# PHPUnit & debugging
+.phpunit.result.cache
+.phpactor.json
+xdebug.log
+xdebug/
+
+# Logs & temp files
+logs/
+*.log
+*.sql
+*.sqlite
+*.sqlite-journal
+
+# -------------------
+# ✅ MISC
+# -------------------
+
+# Ignore backup files
+*.bak
+*.swp
+*.swo
+*~
