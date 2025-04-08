@@ -119,4 +119,27 @@ class ProductController extends Controller
         return null;
     }
 
+    /**
+     * @param string $id
+     * @param Request $request
+     * @return mixed
+     */
+    public function updateProduct(string $id, Request $request): mixed
+    {
+        $product = $this->getProductItemById(self::PRODUCTS, $id);
+
+        if (!$product) {
+            return response()->json([
+                'data' => ['error' => 'Product is not found by id. ' . $id]
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        // TODO update in db
+
+        return response()->json([
+            'data' => ['message' => 'Product updated successfully.']
+        ], Response::HTTP_OK);
+    }
+
+
 }

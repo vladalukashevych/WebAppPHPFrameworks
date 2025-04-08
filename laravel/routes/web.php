@@ -33,3 +33,8 @@ Route::delete('/api/products/{id}', [
     ProductController::class,
     'deleteProduct'
 ])->withoutMiddleware([VerifyCsrfToken::class]);
+
+Route::post('/api/products/{id}', [
+    ProductController::class,
+    'updateProduct'
+])->withoutMiddleware([VerifyCsrfToken::class]);
