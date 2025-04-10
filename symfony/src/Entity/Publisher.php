@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
+use App\Repository\PublisherRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: PublisherRepository::class)]
 #[ORM\Table(name: "symfony_publishers")]
 class Publisher implements JsonSerializable
 {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Author;
+use App\Repository\AuthorRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,14 +11,27 @@ use function response;
 
 class AuthorController extends Controller
 {
+    public const ITEMS_PER_PAGE = 10;
+
+    private AuthorRepository $authorRepository;
+
+    public function __construct(AuthorRepository $authorRepository)
+    {
+        $this->authorRepository = $authorRepository;
+    }
+
     /**
      * Get all authors.
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getAuthors(): mixed
+    public function getAuthors(Request $request): mixed
     {
-        $authors = Author::all();
+        $queryParams = $request->all();
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+        $authors = $this->authorRepository->getAuthors($queryParams, $itemsPerPage);
         return response()->json($authors, Response::HTTP_OK);
     }
 

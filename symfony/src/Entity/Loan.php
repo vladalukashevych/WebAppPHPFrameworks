@@ -2,12 +2,13 @@
 
 namespace App\Entity;
 
+use App\Repository\LoanRepository;
 use Doctrine\ORM\Mapping as ORM;
 use JetBrains\PhpStorm\ArrayShape;
 use JsonSerializable;
 
-#[ORM\Entity]
 #[ORM\Table(name:"symfony_loans")]
+#[ORM\Entity(repositoryClass: LoanRepository::class)]
 class Loan implements JsonSerializable
 {
     #[ORM\Id]

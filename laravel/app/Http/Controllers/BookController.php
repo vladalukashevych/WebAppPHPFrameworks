@@ -6,6 +6,7 @@ use App\Models\Book;
 use App\Models\Author;
 use App\Models\Genre;
 use App\Models\Publisher;
+use App\Repository\BookRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +14,26 @@ use function response;
 
 class BookController extends Controller
 {
+    public const ITEMS_PER_PAGE = 10;
+    private BookRepository $bookRepository;
+
+    public function __construct(BookRepository $bookRepository)
+    {
+        $this->bookRepository = $bookRepository;
+    }
+
     /**
      * Get all books.
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getBooks(): mixed
+    public function getBooks(Request $request): mixed
     {
-        $books = Book::all();
+        $queryParams = $request->all();
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+        $books = $this->bookRepository->getBooks($queryParams, $itemsPerPage);
         return response()->json($books, Response::HTTP_OK);
     }
 
@@ -69,14 +82,15 @@ class BookController extends Controller
         }
 
         $book = $author->books()->create([
-            'title'             => $requestData['title'],
-            'publication_year'  => $requestData['publication_year'],
-            'genre_id_id'          => $genre->id,
-            'publisher_id_id'      => $publisher ? $publisher->id : null,
+            'title'            => $requestData['title'],
+            'publication_year' => $requestData['publication_year'],
+            'genre_id'         => $genre->id,
+            'publisher_id'     => $publisher ? $publisher->id : null,
         ]);
 
         return response()->json(['data' => $book], Response::HTTP_CREATED);
     }
+
 
     /**
      * Update a book by ID.

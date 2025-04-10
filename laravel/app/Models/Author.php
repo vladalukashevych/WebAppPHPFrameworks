@@ -14,6 +14,8 @@ class Author extends Model
         "bio"
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     /**
      * @return HasMany
      */

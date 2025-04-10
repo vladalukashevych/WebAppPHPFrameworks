@@ -14,13 +14,21 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api')]
 final class LoanController extends AbstractController
 {
+    public const ITEMS_PER_PAGE = 10;
+
     public function __construct(private readonly EntityManagerInterface $entityManager) {}
 
     #[Route('/loans', name: 'get_loans', methods: [Request::METHOD_GET])]
-    public function getLoans(): JsonResponse
+    public function getLoans(Request $request): JsonResponse
     {
-        /** @var Loan[] $loans */
-        $loans = $this->entityManager->getRepository(Loan::class)->findAll();
+        $queryParams = $request->query->all();
+        $page = $queryParams['page'] ?? 1;
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+
+        /** @var array $loans */
+        $loans = $this->entityManager->getRepository(Loan::class)->getLoans($queryParams, $page, $itemsPerPage);
+
         return new JsonResponse(['data' => $loans], Response::HTTP_OK);
     }
 
@@ -40,24 +48,24 @@ final class LoanController extends AbstractController
     {
         $requestData = json_decode($request->getContent(), true);
         $loan = new Loan();
-        
+
         try {
-            $loan->setLoanDate(new \DateTime($requestData['loan_date']));
+            $loan->setLoanDate(new \DateTime($requestData['loanDate']));
         } catch (\Exception $e) {
             return new JsonResponse(['data' => ['error' => 'Invalid loan_date format']], Response::HTTP_BAD_REQUEST);
         }
-        if (isset($requestData['return_date'])) {
+        if (isset($requestData['returnDate'])) {
             try {
-                $loan->setReturnDate(new \DateTime($requestData['return_date']));
+                $loan->setReturnDate(new \DateTime($requestData['returnDate']));
             } catch (\Exception $e) {
                 return new JsonResponse(['data' => ['error' => 'Invalid return_date format']], Response::HTTP_BAD_REQUEST);
             }
         }
-        $loan->setBorrowerName($requestData['borrower_name']);
+        $loan->setBorrowerName($requestData['borrowerName']);
 
-        $book = $this->entityManager->getRepository(Book::class)->find($requestData['book_id']);
+        $book = $this->entityManager->getRepository(Book::class)->find($requestData['bookId']);
         if (!$book) {
-            return new JsonResponse(['data' => ['error' => 'Not found book by id ' . $requestData['book_id']]], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['data' => ['error' => 'Not found book by id ' . $requestData['bookId']]], Response::HTTP_NOT_FOUND);
         }
         $loan->setBook($book);
 
@@ -77,27 +85,27 @@ final class LoanController extends AbstractController
         }
 
         $requestData = json_decode($request->getContent(), true);
-        if (isset($requestData['loan_date'])) {
+        if (isset($requestData['loanDate'])) {
             try {
-                $loan->setLoanDate(new \DateTime($requestData['loan_date']));
+                $loan->setLoanDate(new \DateTime($requestData['loanDate']));
             } catch (\Exception $e) {
                 return new JsonResponse(['data' => ['error' => 'Invalid loan_date format']], Response::HTTP_BAD_REQUEST);
             }
         }
-        if (isset($requestData['return_date'])) {
+        if (isset($requestData['returnDate'])) {
             try {
-                $loan->setReturnDate(new \DateTime($requestData['return_date']));
+                $loan->setReturnDate(new \DateTime($requestData['returnDate']));
             } catch (\Exception $e) {
                 return new JsonResponse(['data' => ['error' => 'Invalid return_date format']], Response::HTTP_BAD_REQUEST);
             }
         }
-        if (isset($requestData['borrower_name'])) {
-            $loan->setBorrowerName($requestData['borrower_name']);
+        if (isset($requestData['borrowerName'])) {
+            $loan->setBorrowerName($requestData['borrowerName']);
         }
-        if (isset($requestData['book_id'])) {
-            $book = $this->entityManager->getRepository(Book::class)->find($requestData['book_id']);
+        if (isset($requestData['bookId'])) {
+            $book = $this->entityManager->getRepository(Book::class)->find($requestData['bookId']);
             if (!$book) {
-                return new JsonResponse(['data' => ['error' => 'Not found book by id ' . $requestData['book_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found book by id ' . $requestData['bookId']]], Response::HTTP_NOT_FOUND);
             }
             $loan->setBook($book);
         }

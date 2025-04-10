@@ -14,6 +14,8 @@ class Publisher extends Model
         "address"
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     /**
      * @return HasMany
      */

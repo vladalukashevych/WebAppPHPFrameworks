@@ -13,13 +13,21 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api')]
 final class AuthorController extends AbstractController
 {
+    public const ITEMS_PER_PAGE = 10;
+
     public function __construct(private readonly EntityManagerInterface $entityManager) {}
 
     #[Route('/authors', name: 'get_authors', methods: [Request::METHOD_GET])]
-    public function getAuthors(): JsonResponse
+    public function getAuthors(Request $request): JsonResponse
     {
-        /** @var Author[] $authors */
-        $authors = $this->entityManager->getRepository(Author::class)->findAll();
+        $queryParams = $request->query->all();
+        $page = $queryParams['page'] ?? 1;
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+
+        /** @var array $authors */
+        $authors = $this->entityManager->getRepository(Author::class)->getAuthors($queryParams, $page, $itemsPerPage);
+
         return new JsonResponse(['data' => $authors], Response::HTTP_OK);
     }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Publisher;
+use App\Repository\PublisherRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,14 +11,27 @@ use function response;
 
 class PublisherController extends Controller
 {
+    public const ITEMS_PER_PAGE = 10;
+
+    private PublisherRepository $publisherRepository;
+
+    public function __construct(PublisherRepository $publisherRepository)
+    {
+        $this->publisherRepository = $publisherRepository;
+    }
+
     /**
      * Get all publishers.
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getPublishers(): mixed
+    public function getPublishers(Request $request): mixed
     {
-        $publishers = Publisher::all();
+        $queryParams = $request->all();
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+        $publishers = $this->publisherRepository->getPublishers($queryParams, $itemsPerPage);
         return response()->json($publishers, Response::HTTP_OK);
     }
 

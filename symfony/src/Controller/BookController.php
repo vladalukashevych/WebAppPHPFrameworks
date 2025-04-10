@@ -16,13 +16,21 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api')]
 final class BookController extends AbstractController
 {
+    public const ITEMS_PER_PAGE = 10;
+
     public function __construct(private readonly EntityManagerInterface $entityManager) {}
 
     #[Route('/books', name: 'get_books', methods: [Request::METHOD_GET])]
-    public function getBooks(): JsonResponse
+    public function getBooks(Request $request): JsonResponse
     {
-        /** @var Book[] $books */
-        $books = $this->entityManager->getRepository(Book::class)->findAll();
+        $queryParams = $request->query->all();
+        $page = $queryParams['page'] ?? 1;
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+
+        /** @var array $books */
+        $books = $this->entityManager->getRepository(Book::class)->getBooks($queryParams, $page, $itemsPerPage);
+
         return new JsonResponse(['data' => $books], Response::HTTP_OK);
     }
 
@@ -44,26 +52,26 @@ final class BookController extends AbstractController
 
         $book = new Book();
         $book->setTitle($requestData['title'])
-            ->setPublicationYear($requestData['publication_year']);
+            ->setPublicationYear($requestData['publicationYear']);
 
-        if (isset($requestData['author_id'])) {
-            $author = $this->entityManager->getRepository(Author::class)->find($requestData['author_id']);
+        if (isset($requestData['authorId'])) {
+            $author = $this->entityManager->getRepository(Author::class)->find($requestData['authorId']);
             if (!$author) {
-                return new JsonResponse(['data' => ['error' => 'Not found author by id ' . $requestData['author_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found author by id ' . $requestData['authorId']]], Response::HTTP_NOT_FOUND);
             }
             $book->setAuthor($author);
         }
-        if (isset($requestData['genre_id'])) {
-            $genre = $this->entityManager->getRepository(Genre::class)->find($requestData['genre_id']);
+        if (isset($requestData['genreId'])) {
+            $genre = $this->entityManager->getRepository(Genre::class)->find($requestData['genreId']);
             if (!$genre) {
-                return new JsonResponse(['data' => ['error' => 'Not found genre by id ' . $requestData['genre_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found genre by id ' . $requestData['genreId']]], Response::HTTP_NOT_FOUND);
             }
             $book->setGenre($genre);
         }
-        if (isset($requestData['publisher_id'])) {
-            $publisher = $this->entityManager->getRepository(Publisher::class)->find($requestData['publisher_id']);
+        if (isset($requestData['publisherId'])) {
+            $publisher = $this->entityManager->getRepository(Publisher::class)->find($requestData['publisherId']);
             if (!$publisher) {
-                return new JsonResponse(['data' => ['error' => 'Not found publisher by id ' . $requestData['publisher_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found publisher by id ' . $requestData['publisherId']]], Response::HTTP_NOT_FOUND);
             }
             $book->setPublisher($publisher);
         }
@@ -87,27 +95,27 @@ final class BookController extends AbstractController
         if (isset($requestData['title'])) {
             $book->setTitle($requestData['title']);
         }
-        if (isset($requestData['publication_year'])) {
-            $book->setPublicationYear($requestData['publication_year']);
+        if (isset($requestData['publicationYear'])) {
+            $book->setPublicationYear($requestData['publicationYear']);
         }
-        if (isset($requestData['author_id'])) {
-            $author = $this->entityManager->getRepository(Author::class)->find($requestData['author_id']);
+        if (isset($requestData['authorId'])) {
+            $author = $this->entityManager->getRepository(Author::class)->find($requestData['authorId']);
             if (!$author) {
-                return new JsonResponse(['data' => ['error' => 'Not found author by id ' . $requestData['author_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found author by id ' . $requestData['authorId']]], Response::HTTP_NOT_FOUND);
             }
             $book->setAuthor($author);
         }
-        if (isset($requestData['genre_id'])) {
-            $genre = $this->entityManager->getRepository(Genre::class)->find($requestData['genre_id']);
+        if (isset($requestData['genreId'])) {
+            $genre = $this->entityManager->getRepository(Genre::class)->find($requestData['genreId']);
             if (!$genre) {
-                return new JsonResponse(['data' => ['error' => 'Not found genre by id ' . $requestData['genre_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found genre by id ' . $requestData['genreId']]], Response::HTTP_NOT_FOUND);
             }
             $book->setGenre($genre);
         }
-        if (isset($requestData['publisher_id'])) {
-            $publisher = $this->entityManager->getRepository(Publisher::class)->find($requestData['publisher_id']);
+        if (isset($requestData['publisherId'])) {
+            $publisher = $this->entityManager->getRepository(Publisher::class)->find($requestData['publisherId']);
             if (!$publisher) {
-                return new JsonResponse(['data' => ['error' => 'Not found publisher by id ' . $requestData['publisher_id']]], Response::HTTP_NOT_FOUND);
+                return new JsonResponse(['data' => ['error' => 'Not found publisher by id ' . $requestData['publisherId']]], Response::HTTP_NOT_FOUND);
             }
             $book->setPublisher($publisher);
         }

@@ -13,15 +13,24 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api')]
 final class GenreController extends AbstractController
 {
+    public const ITEMS_PER_PAGE = 10;
+
     public function __construct(private readonly EntityManagerInterface $entityManager) {}
 
     #[Route('/genres', name: 'get_genres', methods: [Request::METHOD_GET])]
-    public function getGenres(): JsonResponse
+    public function getGenres(Request $request): JsonResponse
     {
-        /** @var Genre[] $genres */
-        $genres = $this->entityManager->getRepository(Genre::class)->findAll();
+        $queryParams = $request->query->all();
+        $page = $queryParams['page'] ?? 1;
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+
+        /** @var array $genres */
+        $genres = $this->entityManager->getRepository(Genre::class)->getGenres($queryParams, $page, $itemsPerPage);
+
         return new JsonResponse(['data' => $genres], Response::HTTP_OK);
     }
+
 
     #[Route('/genres/{id}', name: 'get_genre_item', methods: [Request::METHOD_GET])]
     public function getGenreItem(string $id): JsonResponse

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Genre;
+use App\Repository\GenreRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -10,14 +11,27 @@ use function response;
 
 class GenreController extends Controller
 {
+    public const ITEMS_PER_PAGE = 10;
+
+    private GenreRepository $genreRepository;
+
+    public function __construct(GenreRepository $genreRepository)
+    {
+        $this->genreRepository = $genreRepository;
+    }
+
     /**
      * Get all genres.
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getGenres(): mixed
+    public function getGenres(Request $request): mixed
     {
-        $genres = Genre::all();
+        $queryParams = $request->all();
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+        $genres = $this->genreRepository->getGenres($queryParams, $itemsPerPage);
         return response()->json($genres, Response::HTTP_OK);
     }
 

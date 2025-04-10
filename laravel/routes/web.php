@@ -57,7 +57,7 @@ Route::delete('/api/books/{id}', [BookController::class, 'deleteBook'])
 Route::patch('/api/books/{id}', [BookController::class, 'updateBook'])
     ->withoutMiddleware([VerifyCsrfToken::class]);
 
-// Author Routes
+// AuthorRepository Routes
 Route::get('/api/authors', [AuthorController::class, 'getAuthors']);
 Route::get('/api/authors/{id}', [AuthorController::class, 'getAuthorItem']);
 Route::post('/api/authors', [AuthorController::class, 'createAuthor'])

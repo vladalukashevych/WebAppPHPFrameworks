@@ -16,6 +16,8 @@ class Loan extends Model
         "return_date"
     ];
 
+    protected $hidden = ['created_at', 'updated_at'];
+
     /**
      * @return BelongsTo
      */

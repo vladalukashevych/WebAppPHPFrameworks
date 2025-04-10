@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Loan;
 use App\Models\Book;
+use App\Repository\LoanRepository;
 use Exception;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,14 +12,27 @@ use function response;
 
 class LoanController extends Controller
 {
+    public const ITEMS_PER_PAGE = 10;
+
+    private LoanRepository $loanRepository;
+
+    public function __construct(LoanRepository $loanRepository)
+    {
+        $this->loanRepository = $loanRepository;
+    }
+
     /**
      * Get all loans.
      *
+     * @param Request $request
      * @return mixed
      */
-    public function getLoans(): mixed
+    public function getLoans(Request $request): mixed
     {
-        $loans = Loan::all();
+        $queryParams = $request->all();
+        $itemsPerPage = $queryParams['itemsPerPage'] ?? self::ITEMS_PER_PAGE;
+        unset($queryParams['page'], $queryParams['itemsPerPage']);
+        $loans = $this->loanRepository->getLoans($queryParams, $itemsPerPage);
         return response()->json($loans, Response::HTTP_OK);
     }
 
